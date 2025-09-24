@@ -1,7 +1,7 @@
 // lib/views/weather_screen.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../viewmodels/weather_viewmodel.dart';
+import '../view_models/weather_viewmodel.dart';
 
 class WeatherScreen extends StatelessWidget {
   WeatherScreen({super.key});
@@ -13,7 +13,7 @@ class WeatherScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("GetX MVVM Weather App"),
+        title: const Text("GetX MVVM Weather Appss"),
         centerTitle: false,
         ),
       body: Center(
