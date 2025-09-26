@@ -9,14 +9,22 @@ class DeviceService {
     try {
       final Map info = await platform.invokeMethod('getDeviceInfo');
       return DeviceModel(
+        brand: info['brand'] ?? 'Unknown',
+        deviceName: info['deviceName'] ?? 'Unknown',
         os: info['os'] ?? 'Unknown',
         version: info['version'] ?? 'Unknown',
         model: info['model'] ?? 'Unknown',
       );
     } on PlatformException catch (e) {
-      return DeviceModel(os: 'Error', version: 'Error', model: e.message ?? '');
+      return DeviceModel(os: 'Error', version: 'Error', model: e.message ?? '', brand: '', deviceName: '');
     }
   }
+
+  Future<Map<String, String>?> getGpuInfo() async {
+    final info = await platform.invokeMethod('getGpuInfo');
+    return Map<String, String>.from(info);
+  }
+
 
   Future<double?> getBatteryTemperature() async {
     return await platform.invokeMethod("getBatteryTemperature");

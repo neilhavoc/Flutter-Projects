@@ -2,8 +2,15 @@ class DeviceModel {
   final String os;
   final String version;
   final String model;
-
-  DeviceModel({required this.os, required this.version, required this.model});
+  final String brand;
+  final String deviceName;
+  DeviceModel({
+    required this.os, 
+    required this.version, 
+    required this.model,
+    required this.brand,
+    required this.deviceName,
+    });
 }
 
 class CpuInfo {

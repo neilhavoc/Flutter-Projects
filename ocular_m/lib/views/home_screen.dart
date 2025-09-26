@@ -14,9 +14,9 @@ class HomeScreen extends StatelessWidget {
   final NavigationViewModel navVM = Get.put(NavigationViewModel());
 
   final List<Widget> pages = [
+    DeviceInfoScreen(),
     TodoScreen(),
     CompletedScreen(),
-    DeviceInfoScreen(),
     const SettingsScreen(),
   ];
 
@@ -32,16 +32,16 @@ class HomeScreen extends StatelessWidget {
             unselectedItemColor: Colors.black, 
             items: const [
               BottomNavigationBarItem(
+                icon: Icon(Icons.check_circle),
+                label: "Device Info",
+              ),
+              BottomNavigationBarItem(
                 icon: Icon(Icons.list),
                 label: "Todo",
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.location_history),
                 label: "Other Phone Locations",
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.check_circle),
-                label: "Device Info",
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.settings),

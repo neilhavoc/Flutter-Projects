@@ -24,11 +24,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Utility App',
+      
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        scaffoldBackgroundColor: Color(0xaa222f3e),
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.indigo,        // 🎨 App’s main theme color
+          seedColor: Color(0xaa1dd1a1),        // 🎨 App’s main theme color
         ),
 
       

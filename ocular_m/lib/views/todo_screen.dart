@@ -14,7 +14,17 @@ class TodoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("To-Do List")),
+      appBar: AppBar(
+        backgroundColor: Color(0xaa222f3e),
+        title: const Text("To-Do List"),
+        titleTextStyle: TextStyle(
+          color: Colors.white,
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+
+        ),
+        
+        ),
       body: Column(
         children: [
           // Input Field
@@ -22,24 +32,34 @@ class TodoScreen extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
-                Expanded(
+
+                Expanded( //Title field
                   child: TextField(
                     controller: titleTextController,
+                    
                     decoration: const InputDecoration(
-                      hintText: "Enter task title",
+                      filled: true,
+                      fillColor: Colors.white,
+                      hintText: "Enter title",
                       border: OutlineInputBorder(),
                     ),
                   ),
                 ),
-                Expanded(
+
+
+                Expanded( // Details field
                   child: TextField(
                     controller: detailsTextController,
+                    
                     decoration: const InputDecoration(
-                      hintText: "Enter task details",
+                      filled: true,
+                      fillColor: Colors.white,
+                      hintText: "Enter details",
                       border: OutlineInputBorder(),
                     ),
                   ),
                 ),
+
                 const SizedBox(width: 8),
                 ElevatedButton(
                   onPressed: () {
@@ -61,14 +81,16 @@ class TodoScreen extends StatelessWidget {
                     return Container(
                       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                       decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.blue,
-                          width: 1,
-                        ),
+                        color: Colors.white,
+                        // border: Border.all(
+                        //   color: Colors.blue,
+                        //   width: 1,
+                        // ),
                         borderRadius: BorderRadius.circular(12),
                       ),
 
                       child: ListTile(
+                        
                       leading: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [

@@ -9,7 +9,16 @@ class DeviceViewModel extends GetxController {
   final DeviceService _deviceService = DeviceService();
   final BatteryService _batteryService = BatteryService();
 
-  var device = Rx<DeviceModel>(DeviceModel(os: '', version: '', model: ''));
+  var device = Rx<DeviceModel>(
+    DeviceModel(
+      os: '', 
+      version: '', 
+      model: '', 
+      brand: '',
+      deviceName: '',
+    ));
+
+
   var cpuInfo = Rx<CpuInfo>(CpuInfo());
   var battery = Rx<BatteryModel>(BatteryModel(level: 0, status: ''));
   Timer? _timer;
@@ -30,6 +39,7 @@ class DeviceViewModel extends GetxController {
       final batteryTemp = await _deviceService.getBatteryTemperature() ?? 0;
       final cpuTemp = await _deviceService.getCpuTemperature() ?? 0;
       final cpuSpeed = await _deviceService.getCpuSpeed() ?? 0;
+      battery.value = await _batteryService.getBatteryInfo();
       
       cpuInfo.update((val) {
         val?.batteryTemp = batteryTemp;
