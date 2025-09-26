@@ -7,10 +7,10 @@ class TodoViewModel extends GetxController {
 
   var todos = <Todo>[].obs;
   
-  void addTodo(String title){
+  void addTodo(String title, String details){
 
     if (title.trim().isNotEmpty){
-      todos.add(Todo(title: title));
+      todos.add(Todo(title: title, details: details));
 
     }
 

@@ -2,13 +2,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../view_models/todo_view_model.dart';
+import '../viewmodels/todo_view_model.dart';
 
 class TodoScreen extends StatelessWidget {
   TodoScreen({super.key});
 
   final TodoViewModel vm = Get.put(TodoViewModel());
-  final TextEditingController textController = TextEditingController();
+  final TextEditingController titleTextController = TextEditingController();
+   final TextEditingController detailsTextController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -23,9 +24,18 @@ class TodoScreen extends StatelessWidget {
               children: [
                 Expanded(
                   child: TextField(
-                    controller: textController,
+                    controller: titleTextController,
                     decoration: const InputDecoration(
-                      hintText: "Enter task",
+                      hintText: "Enter task title",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: TextField(
+                    controller: detailsTextController,
+                    decoration: const InputDecoration(
+                      hintText: "Enter task details",
                       border: OutlineInputBorder(),
                     ),
                   ),
@@ -33,8 +43,8 @@ class TodoScreen extends StatelessWidget {
                 const SizedBox(width: 8),
                 ElevatedButton(
                   onPressed: () {
-                    vm.addTodo(textController.text);
-                    textController.clear();
+                    vm.addTodo(titleTextController.text, detailsTextController.text);
+                    titleTextController.clear();
                   },
                   child: const Text("Add"),
                 ),
@@ -53,7 +63,7 @@ class TodoScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                         border: Border.all(
                           color: Colors.blue,
-                          width: 2,
+                          width: 1,
                         ),
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -67,9 +77,7 @@ class TodoScreen extends StatelessWidget {
                             onChanged: (_) => vm.toggleTodoStatus(index),
                           ),
                         ],
-
                       ),
-                    
                       title: Text(
                         todo.title,
                         style: TextStyle(
@@ -78,6 +86,15 @@ class TodoScreen extends StatelessWidget {
                               : TextDecoration.none,
                         ),
                       ),
+                      subtitle: Text(
+                        todo.details,
+                        style: TextStyle(
+                          decoration: todo.isDone
+                              ? TextDecoration.lineThrough
+                              : TextDecoration.none,
+                        ),
+                      ),
+                      
                       trailing: IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
                         onPressed: () => vm.deleteTodo(index),

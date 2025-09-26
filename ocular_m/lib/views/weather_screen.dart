@@ -1,7 +1,7 @@
 // lib/views/weather_screen.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../view_models/weather_viewmodel.dart';
+import '../viewmodels/weather_viewmodel.dart';
 
 class WeatherScreen extends StatelessWidget {
   WeatherScreen({super.key});
