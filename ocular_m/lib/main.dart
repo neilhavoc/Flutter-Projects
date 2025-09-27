@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 // import 'views/weather_screen.dart';
 // import 'views/todo_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'views/home_screen.dart';
 void main() {
-  runApp(const MyApp());
+  // 👇 VERY IMPORTANT: wrap app in ProviderScope
+  runApp(const ProviderScope(child: MyApp()));
 }
+
 
 // class MyApp extends StatelessWidget {
 //   const MyApp({super.key});

@@ -38,5 +38,9 @@ class DeviceService {
     return await platform.invokeMethod("getCpuSpeed");
   }
 
+  Future<Map<String, dynamic>?> getRamInfo() async {
+    final info = await platform.invokeMethod('getRamInfo');
+    return Map<String, dynamic>.from(info);
+  }
 
 }

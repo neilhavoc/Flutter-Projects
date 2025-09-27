@@ -9,7 +9,7 @@ class DeviceInfoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DeviceViewModel vm = Get.put(DeviceViewModel());
+    // final DeviceViewModel vm = Get.put(DeviceViewModel());
 
     return Scaffold(
       appBar: AppBar(
@@ -95,10 +95,44 @@ class DeviceInfoScreen extends StatelessWidget {
                 ),
               ),
 
+
+              SizedBox(height: 15),
+
+              Container(  //RAM details container
+              width: double.infinity, // takes full width, you can set fixed too
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.white, Colors.white],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                // boxShadow: [
+                //   BoxShadow(
+                //     color: Colors.black26,
+                //     blurRadius: 6,
+                //     offset: Offset(2, 4), // Shadow position
+                //   ),
+                // ],
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start, // left align texts
+              children: [
+                Text("RAM Info", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                SizedBox(height: 8),
+                Text("Total RAM: ${vm.ramInfo.value.totalRamGB.toStringAsFixed(2)} GB"),
+                Text("Current RAM Usage: ${vm.ramInfo.value.usedRamGB.toStringAsFixed(2)} GB"),
+                Text("Usage Percent: ${vm.ramInfo.value.usagePercent} %"),
+                  ],
+                ),
+              ),
+
+
               
               SizedBox(height: 15),
 
-              Container(  //CPU details container
+              Container(  //Battery details container
               width: double.infinity, // takes full width, you can set fixed too
               padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -128,7 +162,15 @@ class DeviceInfoScreen extends StatelessWidget {
                 ),
               ),
               
+              
+
+
             ],
+
+            
+
+
+
           ),
         );
       }),

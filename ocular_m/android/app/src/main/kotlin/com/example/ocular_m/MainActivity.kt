@@ -11,6 +11,8 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import java.io.File
 import android.opengl.GLES20
+import android.app.ActivityManager
+import android.content.Context
 
 class MainActivity: FlutterActivity() {
     private val CHANNEL = "com.example.device/info"
@@ -113,6 +115,31 @@ class MainActivity: FlutterActivity() {
                             result.error("UNAVAILABLE", "Could not fetch GPU info", null)
                         }
                     }
+
+                    "getRamInfo" -> {
+                        try {
+                            val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+                            val memoryInfo = ActivityManager.MemoryInfo()
+                            activityManager.getMemoryInfo(memoryInfo)
+
+                            val totalRamGB = memoryInfo.totalMem / (1024.0 * 1024.0 * 1024.0) // in GB
+                            val availRamGB = memoryInfo.availMem / (1024.0 * 1024.0 * 1024.0)  // in GB
+                            val usedRamGB = totalRamGB - availRamGB
+                            val usagePercent = ((usedRamGB / totalRamGB) * 100).toInt()
+
+                            val ramInfo = mapOf(
+                                "totalRamGB" to totalRamGB,
+                                "usedRamGB" to usedRamGB,
+                                "usagePercent" to usagePercent
+                            )
+                            result.success(ramInfo)
+                        } catch (e: Exception) {
+                            result.error("UNAVAILABLE", "Could not fetch RAM info", null)
+                        }
+                    }
+
+
+
 
                     else -> result.notImplemented()
                 }

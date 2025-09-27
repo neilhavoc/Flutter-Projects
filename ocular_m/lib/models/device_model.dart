@@ -20,3 +20,17 @@ class CpuInfo {
 
   CpuInfo({this.batteryTemp = 0, this.cpuTemp = 0, this.cpuSpeed = 0});
 }
+
+
+class RamInfo {
+  double totalRamGB;
+  double usedRamGB;
+  int usagePercent;
+
+  RamInfo({
+    this.totalRamGB = 0,
+    this.usedRamGB = 0,
+    this.usagePercent = 0,
+  });
+}
+

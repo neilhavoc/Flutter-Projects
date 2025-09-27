@@ -21,6 +21,8 @@ class DeviceViewModel extends GetxController {
 
   var cpuInfo = Rx<CpuInfo>(CpuInfo());
   var battery = Rx<BatteryModel>(BatteryModel(level: 0, status: ''));
+  var ramInfo = Rx<RamInfo>(RamInfo());
+
   Timer? _timer;
 
   @override
@@ -40,12 +42,24 @@ class DeviceViewModel extends GetxController {
       final cpuTemp = await _deviceService.getCpuTemperature() ?? 0;
       final cpuSpeed = await _deviceService.getCpuSpeed() ?? 0;
       battery.value = await _batteryService.getBatteryInfo();
+      final ramInfoValue = await _deviceService.getRamInfo();
       
       cpuInfo.update((val) {
         val?.batteryTemp = batteryTemp;
         val?.cpuTemp = cpuTemp;
         val?.cpuSpeed = cpuSpeed;
       });
+
+      // final ramInfoValue = await _deviceService.getRamInfo();
+      if (ramInfoValue != null) {
+        ramInfo.update((val) {
+          val?.totalRamGB = (ramInfoValue['totalRamGB'] ?? 0).toDouble();
+          val?.usedRamGB = (ramInfoValue['usedRamGB'] ?? 0).toDouble();
+          val?.usagePercent = ramInfoValue['usagePercent'] ?? 0;
+        });
+      }
+     
+
     });
   }
 
