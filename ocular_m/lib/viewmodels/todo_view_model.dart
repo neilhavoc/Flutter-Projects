@@ -1,31 +1,38 @@
 import 'package:get/get.dart';
 import '../models/todo.dart';
+import '../services/database_service.dart';
 
-
-
-class TodoViewModel extends GetxController {
-
+class TodoController extends GetxController {
   var todos = <Todo>[].obs;
-  
-  void addTodo(String title, String details){
 
-    if (title.trim().isNotEmpty){
-      todos.add(Todo(title: title, details: details));
-
-    }
-
+  @override
+  void onInit() {
+    super.onInit();
+    loadTodos();
   }
 
-  void toggleTodoStatus(int index){
-
-    todos[index].isDone = !todos[index].isDone;
-    todos.refresh(); // notify UI
-
+  Future<void> loadTodos() async {
+    final data = await TodoDatabase.instance.getTodos();
+    todos.assignAll(data);
   }
 
-  void deleteTodo(int index) {
-    todos.removeAt(index);
+  Future<void> addTodo(String title) async {
+    final todo = await TodoDatabase.instance.insertTodo(Todo(title: title));
+    todos.add(todo);
   }
 
+  Future<void> toggleTodoStatus(Todo todo) async {
+    final updated = Todo(
+      id: todo.id,
+      title: todo.title,
+      isDone: !todo.isDone,
+    );
+    await TodoDatabase.instance.updateTodo(updated);
+    loadTodos();
+  }
 
+  Future<void> deleteTodo(int id) async {
+    await TodoDatabase.instance.deleteTodo(id);
+    todos.removeWhere((t) => t.id == id);
+  }
 }

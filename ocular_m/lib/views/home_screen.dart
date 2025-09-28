@@ -14,8 +14,8 @@ class HomeScreen extends ConsumerWidget {
 
   final List<Widget> pages = [
     DeviceInfoScreen(),
-    TodoScreen(),
-    ExpandableMapView(),
+    TodoPage(),
+    LocationMapView(),
     const SettingsScreen(),
   ];
 

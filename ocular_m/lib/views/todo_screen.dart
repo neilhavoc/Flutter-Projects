@@ -1,130 +1,107 @@
-// import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../viewmodels/todo_view_model.dart';
 
-class TodoScreen extends StatelessWidget {
-  TodoScreen({super.key});
-
-  final TodoViewModel vm = Get.put(TodoViewModel());
-  final TextEditingController titleTextController = TextEditingController();
-   final TextEditingController detailsTextController = TextEditingController();
+// ignore: use_key_in_widget_constructors
+class TodoPage extends StatelessWidget {
+  final TodoController controller = Get.put(TodoController());
+  final TextEditingController textController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xAA222f3e),// dark background
       appBar: AppBar(
-        backgroundColor: Color(0xaa222f3e),
-        title: const Text("To-Do List"),
-        titleTextStyle: TextStyle(
-          color: Colors.white,
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-
-        ),
-        
-        ),
+        backgroundColor: Color(0xAA222f3e),
+        title: Text("Todo List", style: TextStyle(color: Colors.white,
+        fontSize: 24.0,
+        fontWeight: FontWeight.bold,)),
+      ),
       body: Column(
         children: [
-          // Input Field
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(12.0),
             child: Row(
               children: [
-
-                Expanded( //Title field
+                Expanded(
                   child: TextField(
-                    controller: titleTextController,
-                    
-                    decoration: const InputDecoration(
+                    controller: textController,
+                    style: TextStyle(color: Colors.black), // text inside = black
+                    decoration: InputDecoration(
+                      hintText: "Enter todo",
+                      hintStyle: TextStyle(color: Colors.grey[600]),
                       filled: true,
-                      fillColor: Colors.white,
-                      hintText: "Enter title",
-                      border: OutlineInputBorder(),
+                      fillColor: Colors.white, // ✅ White background
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: Colors.grey[400]!),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: Colors.blueAccent),
+                      ),
                     ),
                   ),
                 ),
-
-
-                Expanded( // Details field
-                  child: TextField(
-                    controller: detailsTextController,
-                    
-                    decoration: const InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: "Enter details",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
                   onPressed: () {
-                    vm.addTodo(titleTextController.text, detailsTextController.text);
-                    titleTextController.clear();
+                    if (textController.text.isNotEmpty) {
+                      controller.addTodo(textController.text);
+                      textController.clear();
+                    }
                   },
-                  child: const Text("Add"),
+                  child: Text("Add"),
                 ),
               ],
             ),
           ),
-
-          // Task List
           Expanded(
-            child: Obx(() => ListView.builder(
-                  itemCount: vm.todos.length,
-                  itemBuilder: (context, index) {
-                    final todo = vm.todos[index];
-                    return Container(
-                      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        // border: Border.all(
-                        //   color: Colors.blue,
-                        //   width: 1,
-                        // ),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-
-                      child: ListTile(
-                        
-                      leading: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Checkbox(
-                            value: todo.isDone,
-                            onChanged: (_) => vm.toggleTodoStatus(index),
-                          ),
-                        ],
-                      ),
+            child: Obx(() {
+              return ListView.builder(
+                itemCount: controller.todos.length,
+                itemBuilder: (context, index) {
+                  final todo = controller.todos[index];
+                  return Container(
+                    margin: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white, // ✅ White background for list tile
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: ListTile(
                       title: Text(
                         todo.title,
                         style: TextStyle(
+                          color: todo.isDone ? Colors.grey : Colors.black, // text black
                           decoration: todo.isDone
                               ? TextDecoration.lineThrough
                               : TextDecoration.none,
                         ),
                       ),
-                      subtitle: Text(
-                        todo.details,
-                        style: TextStyle(
-                          decoration: todo.isDone
-                              ? TextDecoration.lineThrough
-                              : TextDecoration.none,
-                        ),
+                      leading: Checkbox(
+                        value: todo.isDone,
+                        activeColor: Colors.blueAccent,
+                        checkColor: Colors.white,
+                        onChanged: (_) {
+                          controller.toggleTodoStatus(todo);
+                        },
                       ),
-                      
                       trailing: IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => vm.deleteTodo(index),
+                        icon: Icon(Icons.delete, color: Colors.redAccent),
+                        onPressed: () => controller.deleteTodo(todo.id!),
                       ),
-                    )
-                    );
-                  },
-                )),
+                    ),
+                  );
+                },
+              );
+            }),
           ),
         ],
       ),

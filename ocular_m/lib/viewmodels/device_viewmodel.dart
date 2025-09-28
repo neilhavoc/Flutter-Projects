@@ -11,16 +11,25 @@ class DeviceViewModel extends GetxController {
 
   var device = Rx<DeviceModel>(
     DeviceModel(
-      os: '', 
-      version: '', 
-      model: '', 
+      os: '',
+      version: '',
+      model: '',
       brand: '',
       deviceName: '',
-    ));
-
+      manufacturer: '',
+      board: '',
+      hardware: '',
+      product: '',
+      cpuAbi: '',
+      totalRamGB: '',
+      cpuName: '',
+      cpuCores: 0,
+      cpuMaxFreqMHz: 0,
+    ),
+  );
 
   var cpuInfo = Rx<CpuInfo>(CpuInfo());
-  var battery = Rx<BatteryModel>(BatteryModel(level: 0, status: ''));
+  var battery = Rx<BatteryModel>(BatteryModel());
   var ramInfo = Rx<RamInfo>(RamInfo());
 
   Timer? _timer;
@@ -43,7 +52,7 @@ class DeviceViewModel extends GetxController {
       final cpuSpeed = await _deviceService.getCpuSpeed() ?? 0;
       battery.value = await _batteryService.getBatteryInfo();
       final ramInfoValue = await _deviceService.getRamInfo();
-      
+      // physicalRam = await _deviceService.getPhysicalRam();
       cpuInfo.update((val) {
         val?.batteryTemp = batteryTemp;
         val?.cpuTemp = cpuTemp;
@@ -53,7 +62,8 @@ class DeviceViewModel extends GetxController {
       // final ramInfoValue = await _deviceService.getRamInfo();
       if (ramInfoValue != null) {
         ramInfo.update((val) {
-          val?.totalRamGB = (ramInfoValue['totalRamGB'] ?? 0).toDouble();
+          // val?.totalRamGB = (ramInfoValue['totalRamGB'] ?? 0).toDouble();
+          val?.totalRamUsableGB = (ramInfoValue['totalRamUsableGB'] ?? 0).toDouble();
           val?.usedRamGB = (ramInfoValue['usedRamGB'] ?? 0).toDouble();
           val?.usagePercent = ramInfoValue['usagePercent'] ?? 0;
         });

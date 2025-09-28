@@ -1,13 +1,24 @@
-import 'package:battery_plus/battery_plus.dart';
+import 'package:flutter/services.dart';
 import '../models/battery_model.dart';
 
 class BatteryService {
-  final Battery _battery = Battery();
+  static const _channel = MethodChannel('com.example.device/info');
 
   Future<BatteryModel> getBatteryInfo() async {
-    final level = await _battery.batteryLevel;
-    final status = await _battery.batteryState;
-    return BatteryModel(level: level, status: status.toString());
+    try {
+      final Map<dynamic, dynamic> result =
+          await _channel.invokeMethod('getBatteryInfo');
+      return BatteryModel.fromMap(result);
+    } on PlatformException catch (e) {
+      print("Error fetching battery info: ${e.message}");
+      return BatteryModel(); // return default empty
+    }
   }
-  
+
+  Stream<BatteryModel> batteryInfoStream({Duration interval = const Duration(seconds: 1)}) async* {
+    while (true) {
+      yield await getBatteryInfo();
+      await Future.delayed(interval);
+    }
+  }
 }

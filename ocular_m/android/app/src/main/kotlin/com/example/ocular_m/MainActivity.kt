@@ -40,15 +40,73 @@ class MainActivity: FlutterActivity() {
                             ?: BluetoothAdapter.getDefaultAdapter()?.name
                             ?: Build.MODEL
 
+                        // Physical RAM from /proc/meminfo
+                        var totalRamGB = -1.0
+                        try {
+                            val reader = File("/proc/meminfo").bufferedReader()
+                            val line = reader.readLine() // "MemTotal:       12190792 kB"
+                            reader.close()
+                            val parts = line.split("\\s+".toRegex())
+                            val memKb = parts[1].toLong()
+                            totalRamGB = memKb / (1024.0 * 1024.0) // in GB
+                        } catch (_: Exception) { }
+
+                        // CPU info from /proc/cpuinfo
+                        // CPU Name
+                        var cpuName = "Unknown"
+                        try {
+                            val reader = File("/proc/cpuinfo").bufferedReader()
+                            reader.forEachLine { line ->
+                                if (line.startsWith("Hardware") || line.startsWith("Processor") || line.startsWith("model name")) {
+                                    cpuName = line.split(":")[1].trim()
+                                    return@forEachLine
+                                }
+                            }
+                            reader.close()
+                        } catch (_: Exception) { }
+
+                        if (cpuName == "Unknown") {
+                            cpuName = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                Build.SOC_MODEL ?: Build.HARDWARE
+                            } else {
+                                Build.HARDWARE
+                            }
+                        }
+
+
+                        // CPU cores
+                        val cpuCores = Runtime.getRuntime().availableProcessors()
+
+                        // CPU max frequency
+                        var cpuMaxFreqMHz = -1
+                        try {
+                            val reader = File("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq").bufferedReader()
+                            val line = reader.readLine()
+                            reader.close()
+                            cpuMaxFreqMHz = line.toInt() / 1000 // kHz -> MHz
+                        } catch (_: Exception) { }
+
                         val deviceInfo = mapOf(
                             "os" to "Android",
                             "version" to Build.VERSION.RELEASE,
-                            "model" to Build.MODEL,
+                            "sdkInt" to Build.VERSION.SDK_INT,
                             "brand" to Build.BRAND,
-                            "deviceName" to deviceNameFromSettings
+                            "manufacturer" to Build.MANUFACTURER,
+                            "model" to Build.MODEL,
+                            "deviceName" to deviceNameFromSettings,
+                            "board" to Build.BOARD,
+                            "hardware" to Build.HARDWARE,
+                            "product" to Build.PRODUCT,
+                            "cpuAbi" to Build.SUPPORTED_ABIS.joinToString(),
+                            "totalRamGB" to String.format("%.2f", totalRamGB),
+                            "cpuName" to cpuName,
+                            "cpuCores" to cpuCores,
+                            "cpuMaxFreqMHz" to cpuMaxFreqMHz
                         )
                         result.success(deviceInfo)
                     }
+
+
 
                     "getBatteryTemperature" -> {
                         val intent: Intent? = applicationContext.registerReceiver(
@@ -121,14 +179,14 @@ class MainActivity: FlutterActivity() {
                             val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
                             val memoryInfo = ActivityManager.MemoryInfo()
                             activityManager.getMemoryInfo(memoryInfo)
-
-                            val totalRamGB = memoryInfo.totalMem / (1024.0 * 1024.0 * 1024.0) // in GB
+                            
+                            val totalUsableRamGB = memoryInfo.totalMem / (1024.0 * 1024.0 * 1024.0) // in GB
                             val availRamGB = memoryInfo.availMem / (1024.0 * 1024.0 * 1024.0)  // in GB
-                            val usedRamGB = totalRamGB - availRamGB
-                            val usagePercent = ((usedRamGB / totalRamGB) * 100).toInt()
+                            val usedRamGB = totalUsableRamGB - availRamGB
+                            val usagePercent = ((usedRamGB / totalUsableRamGB) * 100).toInt()
 
                             val ramInfo = mapOf(
-                                "totalRamGB" to totalRamGB,
+                                "totalUsableRamGB" to totalUsableRamGB,
                                 "usedRamGB" to usedRamGB,
                                 "usagePercent" to usagePercent
                             )
@@ -138,8 +196,60 @@ class MainActivity: FlutterActivity() {
                         }
                     }
 
+                    
+                    "getBatteryInfo" -> {
+                        try {
+                            val intent: Intent? = applicationContext.registerReceiver(
+                                null, IntentFilter(Intent.ACTION_BATTERY_CHANGED)
+                            )
 
+                            if (intent == null) {
+                                result.error("UNAVAILABLE", "Battery info not available", null)
+                                return@setMethodCallHandler
+                            }
 
+                            val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
+                            val scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
+                            val batteryPct = if (level >= 0 && scale > 0) level * 100 / scale else -1
+
+                            val status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
+                            val isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
+                                             status == BatteryManager.BATTERY_STATUS_FULL
+
+                            val health = intent.getIntExtra(BatteryManager.EXTRA_HEALTH, -1)
+                            val healthString = when (health) {
+                                BatteryManager.BATTERY_HEALTH_GOOD -> "Good"
+                                BatteryManager.BATTERY_HEALTH_OVERHEAT -> "Overheat"
+                                BatteryManager.BATTERY_HEALTH_DEAD -> "Dead"
+                                BatteryManager.BATTERY_HEALTH_OVER_VOLTAGE -> "Over Voltage"
+                                BatteryManager.BATTERY_HEALTH_UNSPECIFIED_FAILURE -> "Unspecified Failure"
+                                BatteryManager.BATTERY_HEALTH_COLD -> "Cold"
+                                else -> "Unknown"
+                            }
+
+                            // Battery health percentage
+                            val batteryManager = getSystemService(BATTERY_SERVICE) as BatteryManager
+                            val capacity = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
+                            val healthPercent = if (capacity > 0) capacity else batteryPct
+
+                            // Battery temperature
+                            val temp = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1)
+                            val celsius = temp / 10.0
+
+                            val batteryInfo = mapOf(
+                                "levelPercent" to batteryPct,
+                                "isCharging" to isCharging,
+                                "status" to status,
+                                "health" to healthString,
+                                "healthPercent" to healthPercent,
+                                "temperature" to celsius
+                            )
+
+                            result.success(batteryInfo)
+                        } catch (e: Exception) {
+                            result.error("UNAVAILABLE", "Could not fetch battery info", null)
+                        }
+                    }
 
                     else -> result.notImplemented()
                 }
